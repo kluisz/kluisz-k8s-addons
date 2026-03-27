@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Addon Definition",
+  "type": "object",
+  "required": ["name", "description", "category", "namespace", "chart", "versions"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique addon identifier, must match the chart name in the OCI registry"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the addon"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["NETWORKING", "SECURITY", "MONITORING", "STORAGE", "OTHER"],
+      "description": "Addon category, must match AddonCategory enum in cluster-manager"
+    },
+    "namespace": {
+      "type": "string",
+      "description": "Default Kubernetes namespace for the addon"
+    },
+    "chart": {
+      "type": "string",
+      "description": "Chart name in the OCI registry (combined with config.yaml repository to form the full OCI URL)"
+    },
+    "defaultValues": {
+      "type": "object",
+      "description": "Default Helm values as flat key-value pairs; use dot-notation for nested keys (e.g. controller.replicaCount)",
+      "additionalProperties": { "type": "string" }
+    },
+    "versions": {
+      "type": "array",
+      "minItems": 1,
+      "description": "List of available versions, ordered newest first",
+      "items": {
+        "type": "object",
+        "required": ["version", "chartVersion", "minK8sVersion", "maxK8sVersion"],
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "string",
+            "description": "Display version shown to users"
+          },
+          "chartVersion": {
+            "type": "string",
+            "description": "OCI tag used to pull the Helm chart"
+          },
+          "minK8sVersion": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+$",
+            "description": "Minimum supported Kubernetes version (e.g. 1.26)"
+          },
+          "maxK8sVersion": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+$",
+            "description": "Maximum supported Kubernetes version (e.g. 1.32)"
+          },
+          "deprecated": {
+            "type": "boolean",
+            "description": "Mark version as deprecated; still visible but not recommended"
+          },
+          "releaseNotes": {
+            "type": "string",
+            "description": "Changelog or release notes for this version"
+          },
+          "dependencies": {
+            "type": "array",
+            "description": "Other addons that must be installed before this version",
+            "items": {
+              "type": "object",
+              "required": ["addonName", "versionConstraint", "required"],
+              "additionalProperties": false,
+              "properties": {
+                "addonName": { "type": "string" },
+                "versionConstraint": {
+                  "type": "string",
+                  "description": "SemVer constraint (e.g. >=1.16.0)"
+                },
+                "required": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

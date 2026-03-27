@@ -1,0 +1,13 @@
+name: cilium
+description: "eBPF-based networking, observability, and security for Kubernetes"
+category: NETWORKING
+namespace: kube-system
+chart: cilium
+defaultValues:
+  kubeProxyReplacement: "true"
+  operator.replicas: "1"
+versions:
+  - version: "1.19.1"
+    chartVersion: "1.19.1"
+    minK8sVersion: "1.27"
+    maxK8sVersion: "1.32"

@@ -1,0 +1,12 @@
+name: metrics-server
+description: "Scalable and efficient source of container resource metrics for Kubernetes"
+category: MONITORING
+namespace: kube-system
+chart: metrics-server
+defaultValues:
+  args[0]: "--kubelet-insecure-tls"
+versions:
+  - version: "3.13.0"
+    chartVersion: "3.13.0"
+    minK8sVersion: "1.21"
+    maxK8sVersion: "1.32"

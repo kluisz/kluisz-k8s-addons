@@ -1,0 +1,12 @@
+name: kube-state-metrics
+description: "Exposes Kubernetes object state as Prometheus metrics"
+category: MONITORING
+namespace: monitoring
+chart: kube-state-metrics
+defaultValues:
+  replicaCount: "1"
+versions:
+  - version: "6.4.1"
+    chartVersion: "6.4.1"
+    minK8sVersion: "1.23"
+    maxK8sVersion: "1.32"
