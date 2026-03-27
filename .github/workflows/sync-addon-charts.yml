@@ -268,7 +268,7 @@ jobs:
           #    e.g.  repository: quay.io/jetstack/cert-manager-controller
           #       →  repository: asia-south1-.../cert-manager-controller
           def patch_repo(m):
-              val = m.group(1)
+              val = m.group(1).strip('"\'')
               parts = val.split('/')
               if len(parts) >= 2 and '.' in parts[0]:
                   return f"repository: {registry}/{parts[-1]}"
