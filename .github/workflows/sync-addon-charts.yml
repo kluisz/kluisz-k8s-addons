@@ -5,14 +5,7 @@ on:
     branches: [main]
     paths:
       - 'addons/**/*.yaml'
-  workflow_dispatch:
-    inputs:
-      sync_all:
-        description: 'Build and push all addon versions'
-        required: false
-        default: 'true'
-        type: choice
-        options: ['true']
+  workflow_dispatch:  # manual trigger always syncs all addon versions
 
 permissions:
   contents: read
