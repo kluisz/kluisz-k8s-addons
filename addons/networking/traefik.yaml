@@ -1,0 +1,13 @@
+name: traefik
+description: "Cloud-native application proxy and ingress controller for Kubernetes"
+category: NETWORKING
+namespace: traefik
+chart: traefik
+originalRepo: "oci://ghcr.io/traefik/helm/traefik"
+defaultValues:
+  replicas: "1"
+versions:
+  - version: "39.0.0"
+    chartVersion: "39.0.0"
+    minK8sVersion: "1.31"
+    maxK8sVersion: "1.35"
