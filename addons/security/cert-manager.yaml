@@ -4,16 +4,16 @@ category: SECURITY
 namespace: cert-manager
 chart: cert-manager
 originalRepo: "oci://quay.io/jetstack/charts/cert-manager"
-defaultValues:
-  installCRDs: "true"
-  crds.enabled: "true"
-  crds.keep: "true"
-  replicaCount: "1"
-  webhook.replicaCount: "1"
-  cainjector.replicaCount: "1"
-  prometheus.enabled: "true"
-  prometheus.servicemonitor.enabled: "false"
-  global.leaderElection.namespace: "cert-manager"
+# defaultValues:
+#   installCRDs: "true"
+#   crds.enabled: "true"
+#   crds.keep: "true"
+#   replicaCount: "1"
+#   webhook.replicaCount: "1"
+#   cainjector.replicaCount: "1"
+#   prometheus.enabled: "true"
+#   prometheus.servicemonitor.enabled: "false"
+#   global.leaderElection.namespace: "cert-manager"
 versions:
   - version: "v1.20.0"
     chartVersion: "v1.20.0"
