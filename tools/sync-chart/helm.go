@@ -27,12 +27,30 @@ func pullChart(ctx context.Context, repo, chart, version, destDir string) (strin
 
 	pull := action.NewPullWithOpts(action.WithConfig(new(action.Configuration)))
 	pull.Settings = cli.New()
-	pull.RepoURL = repo
 	pull.Version = version
 	pull.Untar = true
 	pull.UntarDir = destDir
 
-	fmt.Printf("  fetching chart index from %s\n", repo)
+	// For OCI repos the Helm SDK requires the full OCI reference as the chart
+	// argument and must NOT have RepoURL set. For HTTP repos the chart name is
+	// passed separately via pull.Run and RepoURL points to the index.
+	//
+	// OCI format:  oci://host/org/chartname  (version set via pull.Version)
+	// HTTP format: https://repo.example.com  (chart name passed to pull.Run)
+	var chartRef string
+	if strings.HasPrefix(repo, "oci://") {
+		// Strip any accidental :version tag from the OCI URL
+		// (e.g. oci://quay.io/jetstack/charts/cert-manager:v1.20.0 → ...cert-manager)
+		chartRef = repo
+		if idx := strings.LastIndex(chartRef, ":"); idx > len("oci://") {
+			chartRef = chartRef[:idx]
+		}
+		fmt.Printf("  OCI pull: %s --version %s\n", chartRef, version)
+	} else {
+		pull.RepoURL = repo
+		chartRef = chart
+		fmt.Printf("  fetching chart index from %s\n", repo)
+	}
 
 	type result struct {
 		out string
@@ -41,7 +59,7 @@ func pullChart(ctx context.Context, repo, chart, version, destDir string) (strin
 	ch := make(chan result, 1)
 	go func() {
 		t := time.Now()
-		out, err := pull.Run(chart)
+		out, err := pull.Run(chartRef)
 		if err == nil {
 			fmt.Printf("  download complete in %s\n", time.Since(t).Round(time.Millisecond))
 		}

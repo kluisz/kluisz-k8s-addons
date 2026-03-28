@@ -3,7 +3,7 @@ description: "Automates the management and issuance of TLS certificates in Kuber
 category: SECURITY
 namespace: cert-manager
 chart: cert-manager
-originalRepo: "oci://quay.io/jetstack/charts/cert-manager:v1.20.0"
+originalRepo: "oci://quay.io/jetstack/charts/cert-manager"
 defaultValues:
   installCRDs: "true"
   crds.enabled: "true"

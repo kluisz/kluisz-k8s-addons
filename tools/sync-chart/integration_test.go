@@ -41,48 +41,51 @@ type chartCase struct {
 
 var chartCases = []chartCase{
 	{
-		name:    "cert-manager v1.19.2",
-		repo:    "https://charts.jetstack.io",
-		chart:   "cert-manager",
-		version: "v1.19.2",
-		// Deploys controller, webhook, cainjector, startupapicheck
+		// Uses OCI repo — matches addons/security/cert-manager.yaml
+		name:               "cert-manager v1.20.0",
+		repo:               "oci://quay.io/jetstack/charts/cert-manager",
+		chart:              "cert-manager",
+		version:            "v1.20.0",
 		wantImgPrefixes:    []string{"quay.io/jetstack/cert-manager-"},
 		wantImgCount:       3,
 		upstreamRegistries: []string{"quay.io/jetstack/cert-manager-"},
 	},
 	{
-		name:    "cert-manager v1.16.2",
-		repo:    "https://charts.jetstack.io",
-		chart:   "cert-manager",
-		version: "v1.16.2",
+		// Uses OCI repo — older version of the same chart
+		name:               "cert-manager v1.19.2",
+		repo:               "oci://quay.io/jetstack/charts/cert-manager",
+		chart:              "cert-manager",
+		version:            "v1.19.2",
 		wantImgPrefixes:    []string{"quay.io/jetstack/cert-manager-"},
 		wantImgCount:       3,
 		upstreamRegistries: []string{"quay.io/jetstack/cert-manager-"},
 	},
 	{
-		name:    "cilium 1.19.1",
-		repo:    "https://helm.cilium.io",
-		chart:   "cilium",
-		version: "1.19.1",
-		// Renders at minimum: cilium agent DaemonSet + operator Deployment
+		// Uses HTTP repo — matches addons/networking/cilium.yaml
+		name:               "cilium 1.19.1",
+		repo:               "https://helm.cilium.io",
+		chart:              "cilium",
+		version:            "1.19.1",
 		wantImgPrefixes:    []string{"quay.io/cilium/"},
 		wantImgCount:       2,
 		upstreamRegistries: []string{"quay.io/cilium/"},
 	},
 	{
-		name:    "kube-state-metrics 6.4.1",
-		repo:    "https://prometheus-community.github.io/helm-charts",
-		chart:   "kube-state-metrics",
-		version: "6.4.1",
+		// Uses OCI repo — matches addons/monitoring/kube-state-metrics.yaml
+		name:               "kube-state-metrics 6.4.1",
+		repo:               "oci://ghcr.io/prometheus-community/charts/kube-state-metrics",
+		chart:              "kube-state-metrics",
+		version:            "6.4.1",
 		wantImgPrefixes:    []string{"registry.k8s.io/kube-state-metrics/"},
 		wantImgCount:       1,
 		upstreamRegistries: []string{"registry.k8s.io"},
 	},
 	{
-		name:    "metrics-server 3.13.0",
-		repo:    "https://kubernetes-sigs.github.io/metrics-server/",
-		chart:   "metrics-server",
-		version: "3.13.0",
+		// Uses HTTP repo — matches addons/monitoring/metrics-server.yaml
+		name:               "metrics-server 3.13.0",
+		repo:               "https://kubernetes-sigs.github.io/metrics-server/",
+		chart:              "metrics-server",
+		version:            "3.13.0",
 		wantImgPrefixes:    []string{"registry.k8s.io/metrics-server/"},
 		wantImgCount:       1,
 		upstreamRegistries: []string{"registry.k8s.io/metrics-server/"},
