@@ -1,0 +1,132 @@
+name: Validate Addon Charts
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'addons/**/*.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 1: Diff the PR, find addon files with new chartVersions, build the
+  #         matrix that the validate job fans out over.
+  # ─────────────────────────────────────────────────────────────────────────────
+  detect:
+    name: Detect new addon versions
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.detect.outputs.matrix }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: mikefarah/yq@v4.44.3
+
+      - name: Detect modified addons with new chartVersions
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          items='[]'
+
+          changed=$(git diff --name-only "$BASE_SHA" HEAD -- 'addons/**/*.yaml' || true)
+
+          if [ -z "$changed" ]; then
+            echo "No addon files changed."
+            echo 'matrix=[]' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          for file in $changed; do
+            [ -f "$file" ] || continue
+
+            name=$(yq '.name' "$file")
+            chart=$(yq '.chart' "$file")
+            original_repo=$(yq '.originalRepo // ""' "$file")
+
+            if [ -z "$original_repo" ] || [ "$original_repo" = '""' ]; then
+              echo "Skipping $name — internal chart, no originalRepo"
+              continue
+            fi
+
+            # Versions in current HEAD
+            mapfile -t current_versions < <(yq '.versions[].chartVersion' "$file")
+
+            # Versions in the base SHA (empty if file is brand-new)
+            mapfile -t prev_versions < <(
+              git show "$BASE_SHA":"$file" 2>/dev/null \
+                | yq '.versions[].chartVersion' 2>/dev/null \
+              || true
+            )
+
+            for version in "${current_versions[@]}"; do
+              [ -z "$version" ] && continue
+
+              is_new=true
+              for prev in "${prev_versions[@]}"; do
+                if [ "$version" = "$prev" ]; then
+                  is_new=false
+                  break
+                fi
+              done
+
+              if $is_new; then
+                echo "New version detected: $name @ $version"
+                items=$(echo "$items" | jq \
+                  --arg f "$file" --arg n "$name" \
+                  --arg c "$chart" --arg r "$original_repo" --arg v "$version" \
+                  '. + [{"file":$f,"name":$n,"chart":$c,"repo":$r,"version":$v}]')
+              fi
+            done
+          done
+
+          matrix=$(echo "$items" | jq -c '.')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "Matrix: $matrix"
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 2: For every (addon, version) pair in the matrix, validate that the
+  #         upstream chart exists and is pullable.
+  # ─────────────────────────────────────────────────────────────────────────────
+  validate:
+    name: "validate: ${{ matrix.addon.name }} @ ${{ matrix.addon.version }}"
+    needs: detect
+    if: ${{ needs.detect.outputs.matrix != '[]' && needs.detect.outputs.matrix != '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        addon: ${{ fromJson(needs.detect.outputs.matrix) }}
+      fail-fast: false
+
+    steps:
+      - name: Validate chart is pullable
+        env:
+          ADDON_NAME:    ${{ matrix.addon.name }}
+          ADDON_CHART:   ${{ matrix.addon.chart }}
+          ADDON_REPO:    ${{ matrix.addon.repo }}
+          ADDON_VERSION: ${{ matrix.addon.version }}
+        run: |
+          set -euo pipefail
+
+          echo "## Validating $ADDON_NAME @ $ADDON_VERSION" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [[ "$ADDON_REPO" == oci://* ]]; then
+            # OCI registry — pull the chart directly by OCI reference
+            echo "Pulling OCI chart: $ADDON_REPO --version $ADDON_VERSION"
+            helm pull "$ADDON_REPO" --version "$ADDON_VERSION" --destination /tmp
+          else
+            # HTTP repo — add repo, then pull by chart name
+            echo "Adding Helm repo: $ADDON_REPO"
+            helm repo add validate-repo "$ADDON_REPO"
+            helm repo update validate-repo
+            echo "Pulling chart: validate-repo/$ADDON_CHART --version $ADDON_VERSION"
+            helm pull "validate-repo/$ADDON_CHART" --version "$ADDON_VERSION" --destination /tmp
+          fi
+
+          echo "Chart $ADDON_NAME @ $ADDON_VERSION is pullable" | tee -a "$GITHUB_STEP_SUMMARY"
