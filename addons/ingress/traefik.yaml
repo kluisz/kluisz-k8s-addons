@@ -4,6 +4,7 @@ category: NETWORKING
 namespace: traefik
 chart: traefik
 originalRepo: "oci://ghcr.io/traefik/helm/traefik"
+isDefault: false
 versions:
   - version: "39.0.0"
     chartVersion: "39.0.0"

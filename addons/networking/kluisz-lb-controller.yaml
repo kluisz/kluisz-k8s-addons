@@ -4,6 +4,7 @@ category: NETWORKING
 namespace: kube-system
 chart: kluisz-lb-controller
 originalRepo: ""
+isDefault: true
 defaultValues: {}
 versions:
   - version: "v0.1.0"

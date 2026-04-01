@@ -4,6 +4,7 @@ category: MONITORING
 namespace: kube-system
 chart: metrics-server
 originalRepo: "https://kubernetes-sigs.github.io/metrics-server/"
+isDefault: false
 # defaultValues:
 #   args[0]: "--kubelet-insecure-tls"
 versions:

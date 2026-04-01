@@ -30,6 +30,10 @@
       "type": "string",
       "description": "Upstream Helm repository URL the chart was sourced from. Empty for internal Kluisz-only charts."
     },
+    "isDefault": {
+      "type": "boolean",
+      "description": "Whether this addon should be preselected by default for users"
+    },
     "defaultValues": {
       "type": "object",
       "description": "Default Helm values as flat key-value pairs; use dot-notation for nested keys (e.g. controller.replicaCount)",
