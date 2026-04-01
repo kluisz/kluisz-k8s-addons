@@ -4,6 +4,7 @@ category: STORAGE
 namespace: kube-system
 chart: kluisz-csi-driver
 originalRepo: ""
+isDefault: true
 defaultValues: {}
 versions:
   - version: "v0.1.0"

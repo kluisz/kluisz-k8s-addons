@@ -4,6 +4,7 @@ category: SECURITY
 namespace: cert-manager
 chart: cert-manager
 originalRepo: "oci://quay.io/jetstack/charts/cert-manager"
+isDefault: false
 # defaultValues:
 #   installCRDs: "true"
 #   crds.enabled: "true"

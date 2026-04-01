@@ -4,6 +4,7 @@ category: MONITORING
 namespace: monitoring
 chart: kube-state-metrics
 originalRepo: "oci://ghcr.io/prometheus-community/charts/kube-state-metrics"
+isDefault: false
 # defaultValues:
 #   replicaCount: "1"
 versions:
