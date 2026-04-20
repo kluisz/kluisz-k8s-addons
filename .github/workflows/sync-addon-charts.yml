@@ -55,7 +55,7 @@ jobs:
                 continue
               fi
 
-              addon_values=$(yq '.defaultValues.valuesYAML // ""' "$file")
+              addon_values=$(yq '.compileTimeValues.valuesYAML // ""' "$file")
               mapfile -t versions < <(yq '.versions[].chartVersion' "$file")
               for version in "${versions[@]}"; do
                 [ -z "$version" ] && continue
@@ -100,7 +100,7 @@ jobs:
                 || true
               )
 
-              addon_values=$(yq '.defaultValues.valuesYAML // ""' "$file")
+              addon_values=$(yq '.compileTimeValues.valuesYAML // ""' "$file")
 
               for version in "${current_versions[@]}"; do
                 [ -z "$version" ] && continue
@@ -154,7 +154,7 @@ jobs:
       ADDON_REPO:    ${{ matrix.addon.repo }}
       ADDON_VERSION: ${{ matrix.addon.version }}
       ADDON_FILE:    ${{ matrix.addon.file }}
-      ADDON_VALUES:  ${{ matrix.addon.addonValues }}
+      ADDON_COMPILE_VALUES:  ${{ matrix.addon.addonValues }}
 
     steps:
       - uses: actions/checkout@v4

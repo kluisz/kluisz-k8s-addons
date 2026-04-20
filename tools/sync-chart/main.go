@@ -24,7 +24,7 @@ func main() {
 		chart:       mustEnv("ADDON_CHART"),
 		repo:        mustEnv("ADDON_REPO"),
 		version:     mustEnv("ADDON_VERSION"),
-		addonValues: os.Getenv("ADDON_VALUES"),
+		addonValues: os.Getenv("ADDON_COMPILE_VALUES"),
 	}
 
 	if err := run(cfg); err != nil {
